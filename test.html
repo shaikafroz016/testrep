@@ -28,15 +28,15 @@
     </style>
     <body>
         
-        <form action="test.php" method="post" enctype="multipart/form-data">
+        <form enctype="multipart/form-data">
             <input type="file" name="file[]" multiple>
-            <input type="submit" value="submit">
+            <input onclick="printimagesnamesfromformdata()" value="submit" type="button">
         </form>
     </body>
 <script>
-    function selectmulitiplefilesandresizewithoutlosingqualitythenaddtoformdataprintbeforeaftersize(){
-        var files = document.getElementById('file').files;
-        var formData = new FormData();
+    function selectmulitiplefilesandresizewithoutlosingqualitythenaddtolistaprintbeforeaftersize(){
+        var files = document.getElementsByName('file[]')[0].files;
+        var imglist=[]
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
             var reader = new FileReader();
@@ -65,14 +65,33 @@
                     canvas.height = height;
                     var ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, width, height);
-                    var dataurl = canvas.toDataURL('image/jpeg');
-                    formData.append('file[]', dataurl);
+                    // var image=new Image();
+                    // image.src = canvas.toDataURL('image/jpeg');
+                    var blob = dataURLtoBlob(canvas.toDataURL('image/jpeg'));
+                    var file = new File([blob], 'image.jpg', {type: 'image/jpeg'});
+                    imglist.push(file);
+                    //formData.append('file[]', dataurl);
+                    // console.log('before: ' + file.size);
+                    // console.log('after: ' + dataurl.length);
                 }
                 img.src = event.target.result;
             }
             reader.readAsDataURL(file);
         }
-        return formData;
+        return imglist;    
     }
-   
+       
+    function dataURLtoBlob(dataurl) {
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], {type:mime});
+    }
+    function printimagesnamesfromformdata(){
+        var imglist=selectmulitiplefilesandresizewithoutlosingqualitythenaddtolistaprintbeforeaftersize();
+        console.log(imglist);
+    }
+    
 </script>
