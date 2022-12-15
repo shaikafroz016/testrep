@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>test</title>
+    </head>
+    <style>
+        body{
+            background-color: #f1f1f1;
+        }
+        form{
+            width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        input[type="file"]{
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+        input[type="submit"]{
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <body>
+        
+        <form action="test.php" method="post" enctype="multipart/form-data">
+            <input type="file" name="file[]" multiple>
+            <input type="submit" value="submit">
+        </form>
+    </body>
+<script>
+    function selectmulitiplefilesandresizewithoutlosingqualitythenaddtoformdataprintbeforeaftersize(){
+        var files = document.getElementById('file').files;
+        var formData = new FormData();
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                var img = new Image();
+                img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    var MAX_WIDTH = 800;
+                    var MAX_HEIGHT = 600;
+                    var width = img.width;
+                    var height = img.height;
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+                    var dataurl = canvas.toDataURL('image/jpeg');
+                    formData.append('file[]', dataurl);
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+        return formData;
+    }
+   
+</script>
